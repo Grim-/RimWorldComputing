@@ -69,6 +69,23 @@ namespace RimWorldComputing
 				
 			}
 		}
+
+        /// <summary>
+        /// Run in Computing TickWorker checks devices every NormalTick or more likely RareTick and removes devices that no longer have a comppowertrader component or power
+        /// </summary>
+        public void checkDevicesStatus()
+        {
+            for (int i = 0; i < allColonistBuildings.Count; i++)
+            {
+                var currentBuilding = allColonistBuildings[i];
+                var currentBuildingCompPowTrader = currentBuilding.TryGetComp<CompPowerTrader>();
+
+                if (currentBuildingCompPowTrader != null &&  currentBuildingCompPowTrader.PowerOn == false)
+                {
+                    allColonistBuildings.Remove(currentBuilding);
+                }
+            }
+        }
 		
 		public List<Building> GetDeviceList()
         {

@@ -14,7 +14,7 @@
 
 	<ThingDef ParentName="BuildingBase">
 		<defName>Test_DataTerminal</defName>
-		<thingClass>Computing.Building_Terminal</thingClass>
+		<thingClass>RimWorldComputing.Building_Terminal</thingClass>
 		<label>Terminal</label>
 		<description>A terminal used to control other connected devices.</description>
 		<graphicData>

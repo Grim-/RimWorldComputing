@@ -6,7 +6,7 @@ using UnityEngine;
 using Verse;
 using RimWorld;
 
-namespace Computing
+namespace RimWorldComputing
 {
 	public class DataNet 
 	{
@@ -45,8 +45,10 @@ namespace Computing
             for (int i = 0; i < allColonistBuildings.Count; i++)
 			{
 				var currentBuilding = allColonistBuildings[i];
-                Log.Message(currentBuilding.Label);
-                if (currentBuilding.TryGetComp<CompPowerTrader>() != null && currentBuilding.TryGetComp<CompPowerTrader>().PowerOn == true)
+                var currentBuildingCompPowTrader = currentBuilding.TryGetComp<CompPowerTrader>();
+
+
+                if (currentBuildingCompPowTrader != null && currentBuildingCompPowTrader.PowerOn == true)
 				{
                     //this is a colonist building, it has a power trader component and currently has power
                     Log.Message("Datanet: this is a colonist building, it has a power trader component and currently has power");
@@ -58,7 +60,7 @@ namespace Computing
                     if (currentBuilding.GetType() == typeof(Building_TurretGun) )
 					{
 						Log.Message("Datanet: This is a turret, can be added to list");
-                        Add(currentBuilding);
+                        AddDevice(currentBuilding);
 					}
 					
 				}
@@ -75,13 +77,13 @@ namespace Computing
         }
 		
 		
-		public void Add(Building b)
+		public void AddDevice(Building b)
 		{
 
             devices.Add(b);
 		}
 	
-		public void Remove(Building b)
+		public void RemoveDevice(Building b)
 		{
 			
 			

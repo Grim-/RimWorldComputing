@@ -6,7 +6,7 @@ using UnityEngine;
 using Verse;
 using RimWorld;
 
-namespace Computing
+namespace RimWorldComputing
 {
 	
 	//TODO: Add Floater/ing Menu, test turrets focusing target.

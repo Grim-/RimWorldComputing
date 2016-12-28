@@ -33,7 +33,7 @@
 			<Flammability>0.0</Flammability>
 			<Beauty>12</Beauty>
 		</statBases>
-		<tickerType>Normal</tickerType>
+		<tickerType>Rare</tickerType>
 		<size>(1,1)</size>
 		<selectable>true</selectable>
 		<rotatable>true</rotatable>
@@ -56,5 +56,4 @@
 			<li Class="CompProperties_Breakdownable"/>
 		</comps>
 	</ThingDef>
-
 </Buildings>

@@ -23,6 +23,7 @@ namespace RimWorldComputing
 		
 		private bool destroyedFlag = false;
 		private DataNet dataNet;
+        private Map gameMap;
 		protected CompPowerTransmitter powerComp;
 
 
@@ -37,9 +38,9 @@ namespace RimWorldComputing
 
             
 			Log.Message("Spawn Setup of " + this.LabelShort);
-			
+            gameMap = map;
 			SetComponentReferences();
-            dataNet = new DataNet(map.listerBuildings.allBuildingsColonist);
+            dataNet = new DataNet(gameMap.listerBuildings.allBuildingsColonist);
         }
 
 
@@ -93,15 +94,36 @@ namespace RimWorldComputing
 
             //Create a float menu option for each device
             var devices = dataNet.GetDeviceList();
-            Log.Message(devices.Count.ToString());
+
             foreach(var device in devices)
             {
-                FloatMenuOption item = new FloatMenuOption("POWER OFF : " + device.Label, delegate 
-                {
-                 dataNet.PowerOffDevice(device);
-                });
 
-                menuOptions.Add(item);
+                if (device.GetType() == typeof(Building_TurretGun))
+                {
+                    FloatMenuOption item = new FloatMenuOption("Terminal: TURRET.TOGGLE_POWER_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
+                     {
+                         dataNet.ToggleDevicePower(device);
+                     });
+                    menuOptions.Add(item);
+                }
+                else if (device.GetType() == typeof(Building_TrapExplosive))
+                {
+                    FloatMenuOption item = new FloatMenuOption("Terminal: EXPLOSIVE.REMOTE_DETONATE_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
+                    {
+                        dataNet.DetonateExplosive(device);
+                    });
+                    menuOptions.Add(item);
+                }
+                else if (device.Label == "standing lamp")
+                {
+                    FloatMenuOption item = new FloatMenuOption("Terminal: LAMP.TOGGLE_POWER_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
+                    {
+                        dataNet.ToggleDevicePower(device);
+                    });
+                    menuOptions.Add(item);
+                }
+
+
             }
 			
            
@@ -146,7 +168,8 @@ namespace RimWorldComputing
 		/// <param name="tickerAmount"></param>
 		private void DoTickerWork(int tickerAmount)
 		{
-			
+            Log.Message("Doing ticker work, rebuilding device list");
+            dataNet.RebuildListOfDevices(gameMap);
 		}
 	}
 }

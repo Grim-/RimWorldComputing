@@ -30,54 +30,48 @@ namespace RimWorldComputing
 		/// </summary>
 		private void BuildListOfDevices(List<Building> allColonistBuildings)
 		{
-
+            deviceList.Clear();
             Log.Message("Datanet: Building list of devices");
-            Log.Message("Datanet: Pre Loop - Number Of Devices(colonist buildings) # " + allColonistBuildings.Count);
+            //Log.Message("Datanet: Pre Loop - Number Of Devices(colonist buildings) # " + allColonistBuildings.Count);
             for (int i = 0; i < allColonistBuildings.Count; i++)
 			{
 				var currentBuilding = allColonistBuildings[i];
                 var currentBuildingCompPowTrader = currentBuilding.TryGetComp<CompPowerTrader>();
 
 
-                if (currentBuilding != null && currentBuildingCompPowTrader != null && currentBuildingCompPowTrader.PowerOn == true)
-				{
                     //this is a colonist building, it has a power trader component and currently has power
                     Log.Message("Datanet:  Thing: " + currentBuilding.Label + " it has a power trader component and currently has power");
                     Log.Message("Datanet:  Thing: " + currentBuilding.Label + " is Type " + currentBuilding.GetType().ToString() );
 
-                    if (currentBuilding.GetType() == typeof(Building_TurretGun) )
-					{
+                if (currentBuilding.GetType() == typeof(Building_TurretGun) )
+				{
                         Log.Message("Datanet:  Thing: " + currentBuilding.Label + " is Type " + currentBuilding.GetType().ToString() + " and can be added to the devices list");
 
-                            AddDevice(allColonistBuildings[i] as Building_TurretGun);
-					}
-					
+                            AddDevice(currentBuilding as Building_TurretGun);
 				}
-					
-			}
-		}
-
-        /// <summary>
-        /// Run in Computing TickWorker checks devices every NormalTick or more likely RareTick and removes devices that no longer have a comppowertrader component or power
-        /// </summary>
-        public void checkDevicesStatus()
-        {
-
-            if (this.allColonistBuildings == null)
-                return;
-
-            Log.Message("Datanet: Checking status of Devices in list");
-            for (int i = 0; i < this.allColonistBuildings.Count; i++)
-            {
-                var currentBuilding = this.allColonistBuildings[i];
-                var currentBuildingCompPowTrader = currentBuilding.TryGetComp<CompPowerTrader>();
-
-                if (currentBuilding != null && currentBuildingCompPowTrader != null &&  currentBuildingCompPowTrader.PowerOn == false)
+                else if (currentBuilding.GetType() == typeof(Building_TrapExplosive))
                 {
-                    allColonistBuildings.Remove(currentBuilding);
+                    Log.Message("Datanet:  Thing: " + currentBuilding.Label + " is Type " + currentBuilding.GetType().ToString() + " and can be added to the devices list");
+
+                    AddDevice(currentBuilding as Building_TrapExplosive);
                 }
+                else if (currentBuilding.Label == "standing lamp")
+                {
+                    Log.Message("Datanet:  Thing: " + currentBuilding.Label + " is Type " + currentBuilding.GetType().ToString() + " and can be added to the devices list");
+
+                    AddDevice(allColonistBuildings[i]);
+                }
+
+
             }
+		}
+        public void RebuildListOfDevices(Map map)
+        {
+            
+            BuildListOfDevices(map.listerBuildings.allBuildingsColonist);
+
         }
+
 		
 		public List<Building> GetDeviceList()
         {
@@ -93,14 +87,19 @@ namespace RimWorldComputing
             return 0;
         }
 		
-        public void PowerOffDevice(Building b)
+        public void ToggleDevicePower(Building b)
         {
-            var device = this.allColonistBuildings.Find(x => x.thingIDNumber == b.thingIDNumber);
-            device.TryGetComp<CompPowerTrader>().ReceiveCompSignal("FlickedOff");
-            device.TryGetComp<CompPowerTrader>().PowerOn = false;
+            var device = this.deviceList.Find(x => x.thingIDNumber == b.thingIDNumber);
+            device.TryGetComp<CompFlickable>().DoFlick();
         }
 
-		public void AddDevice(Building b)
+        public void DetonateExplosive(Building b)
+        {
+            var device = this.deviceList.Find(x => x.thingIDNumber == b.thingIDNumber);
+            device.TryGetComp<CompExplosive>().StartWick(null);
+        }
+
+        public void AddDevice(Building b)
 		{
 
             deviceList.Add(b);

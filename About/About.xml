@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<name>Computing</name>
-	
-	<author>Bry</author>
+	<name>RimWorldComputing</name>
+	<author>Grim (Bryan) </author>
 	<url>#</url>
 	<targetVersion>0.16.1393</targetVersion>
 	<description>
-	
+	Adds a new power building Terminal, allows you to control certain devices on your power network.
 	</description>
 </ModMetaData>

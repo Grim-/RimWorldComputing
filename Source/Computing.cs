@@ -8,15 +8,15 @@ using RimWorld;
 
 namespace RimWorldComputing
 {
-	
-	//TODO: Add Floater/ing Menu, test turrets focusing target.
-	//
-	//Make list of controlable devices, build Float menu for each controllable device with interaction eg "Power Off > Turret 1" "Open > AutoDoor 1"
-	//Ignore devices without power
-	//
-	
-	
-	public class Building_Terminal : Building
+
+    //TODO: Add Floater/ing Menu, test turrets focusing target.
+    //
+    //Make list of controlable devices, build Float menu for each controllable device with interaction eg "Power Off > Turret 1" "Open > AutoDoor 1"
+    //Ignore devices without power
+    //
+
+    [StaticConstructorOnStartup]
+    public class Building_Terminal : Building
 	{
 		// 60Ticks = 1s // 20000Ticks = 1 Day
 		// Destroyed flag. Most of the time not really needed, but sometimes...
@@ -34,22 +34,23 @@ namespace RimWorldComputing
 		{
 			// Do the work of the base class (Building)
 			base.SpawnSetup(map);
-			
-			
+
+            
 			Log.Message("Spawn Setup of " + this.LabelShort);
 			
 			SetComponentReferences();
-            dataNet = new DataNet();
-
+            dataNet = new DataNet(map.listerBuildings.allBuildingsColonist);
         }
 
 
-		
-		
-		/// <summary>
-		/// Find the PowerCompTransmitter
-		/// </summary>
-		private void SetComponentReferences()
+
+
+
+
+        /// <summary>
+        /// Find the PowerCompTransmitter
+        /// </summary>
+        private void SetComponentReferences()
 		{
 			this.powerComp = base.GetComp<CompPowerTransmitter>();
 	
@@ -88,10 +89,24 @@ namespace RimWorldComputing
 		public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn myPawn)
 		{
 			List<FloatMenuOption> menuOptions = new List<FloatMenuOption>();
+
+
+            //Create a float menu option for each device
+            var devices = dataNet.GetDeviceList();
+            Log.Message(devices.Count.ToString());
+            foreach(var device in devices)
+            {
+                FloatMenuOption item = new FloatMenuOption("POWER OFF : " + device.Label, delegate 
+                {
+                 dataNet.PowerOffDevice(device);
+                });
+
+                menuOptions.Add(item);
+            }
 			
-			FloatMenuOption item = new FloatMenuOption("POWER OFF", null, MenuOptionPriority.High, null, null, 0f, null);
-						
-			return menuOptions;
+           
+
+            return menuOptions;
 		}
 
 		/// <summary>

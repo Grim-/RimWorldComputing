@@ -8,65 +8,52 @@ using RimWorld;
 
 namespace RimWorldComputing
 {
-	public class DataNet 
+    [StaticConstructorOnStartup]
+    public class DataNet 
 	{
 		
-		private static DataNet instance;
 		private List<Building> allColonistBuildings;
-        private List<Building> devices;
+        private List<Building> deviceList;
 		
-		public DataNet()
+		public DataNet(List<Building> colonistBuildings)
 		{
-			BuildListOfDevices();
+            this.allColonistBuildings = colonistBuildings;
+
+            deviceList = new List<Building>();
+
+			BuildListOfDevices(this.allColonistBuildings);
 		}
 		
-		public static DataNet Instance
-		{
-			get
-			{
-				if(instance == null)
-				{
-					instance = new DataNet();
-				}
-				return instance;
-			}
-		}
 		
 	    /// <summary>
 		/// Find all the devices we are going to be controlling and add them to lists of type
 		/// </summary>
-		private void BuildListOfDevices()
+		private void BuildListOfDevices(List<Building> allColonistBuildings)
 		{
 
-			allColonistBuildings = Find.AnyPlayerHomeMap.listerBuildings.allBuildingsColonist;
-
             Log.Message("Datanet: Building list of devices");
-            Log.Message("Datanet: Pre Loop - Number Of Devices(buildings) #" + allColonistBuildings.Count);
+            Log.Message("Datanet: Pre Loop - Number Of Devices(colonist buildings) # " + allColonistBuildings.Count);
             for (int i = 0; i < allColonistBuildings.Count; i++)
 			{
 				var currentBuilding = allColonistBuildings[i];
                 var currentBuildingCompPowTrader = currentBuilding.TryGetComp<CompPowerTrader>();
 
 
-                if (currentBuildingCompPowTrader != null && currentBuildingCompPowTrader.PowerOn == true)
+                if (currentBuilding != null && currentBuildingCompPowTrader != null && currentBuildingCompPowTrader.PowerOn == true)
 				{
                     //this is a colonist building, it has a power trader component and currently has power
-                    Log.Message("Datanet: this is a colonist building, it has a power trader component and currently has power");
-                    Log.Message("Datanet:  " + currentBuilding.GetType().ToString() + " " + typeof(Building_Turret).ToString() );
-
-
-                        
+                    Log.Message("Datanet:  Thing: " + currentBuilding.Label + " it has a power trader component and currently has power");
+                    Log.Message("Datanet:  Thing: " + currentBuilding.Label + " is Type " + currentBuilding.GetType().ToString() );
 
                     if (currentBuilding.GetType() == typeof(Building_TurretGun) )
 					{
-						Log.Message("Datanet: This is a turret, can be added to list");
-                        AddDevice(currentBuilding);
+                        Log.Message("Datanet:  Thing: " + currentBuilding.Label + " is Type " + currentBuilding.GetType().ToString() + " and can be added to the devices list");
+
+                            AddDevice(allColonistBuildings[i] as Building_TurretGun);
 					}
 					
 				}
-				
-				
-				
+					
 			}
 		}
 
@@ -75,12 +62,17 @@ namespace RimWorldComputing
         /// </summary>
         public void checkDevicesStatus()
         {
-            for (int i = 0; i < allColonistBuildings.Count; i++)
+
+            if (this.allColonistBuildings == null)
+                return;
+
+            Log.Message("Datanet: Checking status of Devices in list");
+            for (int i = 0; i < this.allColonistBuildings.Count; i++)
             {
-                var currentBuilding = allColonistBuildings[i];
+                var currentBuilding = this.allColonistBuildings[i];
                 var currentBuildingCompPowTrader = currentBuilding.TryGetComp<CompPowerTrader>();
 
-                if (currentBuildingCompPowTrader != null &&  currentBuildingCompPowTrader.PowerOn == false)
+                if (currentBuilding != null && currentBuildingCompPowTrader != null &&  currentBuildingCompPowTrader.PowerOn == false)
                 {
                     allColonistBuildings.Remove(currentBuilding);
                 }
@@ -90,14 +82,28 @@ namespace RimWorldComputing
 		public List<Building> GetDeviceList()
         {
 
-            return devices;
+            return this.deviceList;
+        }
+
+        public int GetDeviceListCount()
+        {
+            if (deviceList != null)
+                return deviceList.Count;
+
+            return 0;
         }
 		
-		
+        public void PowerOffDevice(Building b)
+        {
+            var device = this.allColonistBuildings.Find(x => x.thingIDNumber == b.thingIDNumber);
+            device.TryGetComp<CompPowerTrader>().ReceiveCompSignal("FlickedOff");
+            device.TryGetComp<CompPowerTrader>().PowerOn = false;
+        }
+
 		public void AddDevice(Building b)
 		{
 
-            devices.Add(b);
+            deviceList.Add(b);
 		}
 	
 		public void RemoveDevice(Building b)

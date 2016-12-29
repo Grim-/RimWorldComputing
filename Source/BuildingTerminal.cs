@@ -8,13 +8,6 @@ using RimWorld;
 
 namespace RimWorldComputing
 {
-
-    //TODO: Add Floater/ing Menu, test turrets focusing target.
-    //
-    //Make list of controlable devices, build Float menu for each controllable device with interaction eg "Power Off > Turret 1" "Open > AutoDoor 1"
-    //Ignore devices without power
-    //
-
     [StaticConstructorOnStartup]
     public class Building_Terminal : Building
 	{
@@ -22,7 +15,7 @@ namespace RimWorldComputing
 		// Destroyed flag. Most of the time not really needed, but sometimes...
 		
 		private bool destroyedFlag = false;
-		private DataNet dataNet;
+		public DataNet dataNet;
         private Map gameMap;
 		protected CompPowerTransmitter powerComp;
 
@@ -37,15 +30,11 @@ namespace RimWorldComputing
 			base.SpawnSetup(map);
 
             
-			Log.Message("Spawn Setup of " + this.LabelShort);
+			//Log.Message("Spawn Setup of " + this.LabelShort);
             gameMap = map;
 			SetComponentReferences();
             dataNet = new DataNet(gameMap.listerBuildings.allBuildingsColonist);
         }
-
-
-
-
 
 
         /// <summary>
@@ -85,57 +74,55 @@ namespace RimWorldComputing
 			// Call work function
 			DoTickerWork(250);
 		}
-		
-
-		public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn myPawn)
-		{
-			List<FloatMenuOption> menuOptions = new List<FloatMenuOption>();
 
 
-            //Create a float menu option for each device
-            var devices = dataNet.GetDeviceList();
 
-            foreach(var device in devices)
-            {
-
-                if (device.GetType() == typeof(Building_TurretGun))
-                {
-                    FloatMenuOption item = new FloatMenuOption("Terminal: TURRET.TOGGLE_POWER_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
-                     {
-                         dataNet.ToggleDevicePower(device);
-                     });
-                    menuOptions.Add(item);
-                }
-                else if (device.GetType() == typeof(Building_TrapExplosive))
-                {
-                    FloatMenuOption item = new FloatMenuOption("Terminal: EXPLOSIVE.REMOTE_DETONATE_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
-                    {
-                        dataNet.DetonateExplosive(device);
-                    });
-                    menuOptions.Add(item);
-                }
-                else if (device.Label == "standing lamp")
-                {
-                    FloatMenuOption item = new FloatMenuOption("Terminal: LAMP.TOGGLE_POWER_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
-                    {
-                        dataNet.ToggleDevicePower(device);
-                    });
-                    menuOptions.Add(item);
-                }
+        //public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn myPawn)
+        //{
+        //    List<FloatMenuOption> menuOptions = new List<FloatMenuOption>();
 
 
-            }
-			
-           
+        //    Create a float menu option for each device
+        //    var devices = dataNet.GetDeviceList();
 
-            return menuOptions;
-		}
+        //    foreach (var device in devices)
+        //    {
 
-		/// <summary>
-		/// This is used, when the Ticker in the XML is set to 'Normal'
-		/// This Tick is done often (60 times per second)
-		/// </summary>
-		public override void Tick()
+        //        if (device.type == DataNet.DeviceTypes.TURRET)
+        //        {
+        //            FloatMenuOption item = new FloatMenuOption("Terminal: TURRET.TOGGLE_POWER_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
+        //             {
+        //                 dataNet.ToggleDevicePower(device);
+        //             });
+        //            menuOptions.Add(item);
+        //        }
+        //        else if (device.type == DataNet.DeviceTypes.TRAP)
+        //        {
+        //            FloatMenuOption item = new FloatMenuOption("Terminal: EXPLOSIVE.REMOTE_DETONATE_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
+        //            {
+        //                dataNet.DetonateExplosive(device);
+        //            });
+        //            menuOptions.Add(item);
+        //        }
+        //        else if (device.type == DataNet.DeviceTypes.LIGHT)
+        //        {
+        //            FloatMenuOption item = new FloatMenuOption("Terminal: LAMP.TOGGLE_POWER_BY_ID(" + devices.IndexOf(device).ToString() + ") ", delegate
+        //            {
+        //                dataNet.ToggleDevicePower(device);
+        //            });
+        //            menuOptions.Add(item);
+        //        }
+
+
+        //    }
+        //    return menuOptions;
+        //}
+
+        /// <summary>
+        /// This is used, when the Ticker in the XML is set to 'Normal'
+        /// This Tick is done often (60 times per second)
+        /// </summary>
+        public override void Tick()
 		{
 			if (destroyedFlag) // Do nothing further, when destroyed (just a safety)
 				return;

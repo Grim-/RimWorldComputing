@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<MainTabDefs>
+  <MainTabDef>
+    <defName>Data</defName>
+    <label>Data</label>
+    <description>DAAAAAAAATTTTTTTTAAAAAAAAAA</description>
+    <windowClass>RimWorldComputing.MainTabWindow_DataNew</windowClass>
+    <order>1000</order>
+  </MainTabDef>
+</MainTabDefs>
